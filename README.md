@@ -52,16 +52,20 @@ cd claude-cut
 **2. Create your environment file**
 
 ```bash
-cp .env.example .env.local
+cp .env.example .env
 ```
 
-Edit `.env.local` and add your Anthropic API key:
+> **Note:** Docker Compose only reads variables for `${VAR}` substitution in `docker-compose.yml` from a file literally named `.env` in the project root — it does **not** read `.env.local`. The app itself (Next.js) reads both, but for the `CLIPS_BASE_PATH` volume mount below to work, the value must live in `.env`. If you keep secrets in `.env.local`, also copy `CLIPS_BASE_PATH` into `.env` (or symlink one to the other).
+
+Edit `.env` and add your Anthropic API key and clips folder:
 
 ```
 ANTHROPIC_API_KEY=sk-ant-...
 PROCESSOR_URL=http://processor:8000
-CLIPS_BASE_PATH=/clips
+CLIPS_BASE_PATH=/Users/yourname/Movies
 ```
+
+`CLIPS_BASE_PATH` should be the **parent folder** containing your project clip folders on your host machine — for example, if your clips live at `/Users/yourname/Movies/NYC_Vlog`, set `CLIPS_BASE_PATH=/Users/yourname/Movies`. This path is bind-mounted into the `web` container at the same path so the app can read clips from folders you select at that location or below.
 
 **3. Start with Docker**
 
