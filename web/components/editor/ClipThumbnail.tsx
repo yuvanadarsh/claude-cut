@@ -5,7 +5,8 @@ import { Film } from 'lucide-react';
 import type { Clip } from '@/types';
 
 interface ClipThumbnailProps {
-  clip: Pick<Clip, 'id' | 'filename' | 'durationSeconds'>;
+  clip: Pick<Clip, 'id' | 'filename' | 'durationSeconds' | 'thumbnailPath'>;
+  projectId: string;
 }
 
 function formatDuration(seconds: number): string {
@@ -14,8 +15,17 @@ function formatDuration(seconds: number): string {
   return `${mins}:${secs}`;
 }
 
-export function ClipThumbnail({ clip }: ClipThumbnailProps) {
+function truncateFilename(filename: string, maxLength = 20): string {
+  if (filename.length <= maxLength) return filename;
+  return `${filename.slice(0, maxLength - 1)}…`;
+}
+
+export function ClipThumbnail({ clip, projectId }: ClipThumbnailProps) {
   const [isHovered, setIsHovered] = useState(false);
+
+  const thumbnailSrc = clip.thumbnailPath
+    ? `/api/projects/${projectId}/thumbnail/${clip.thumbnailPath}`
+    : undefined;
 
   return (
     <div
@@ -39,9 +49,12 @@ export function ClipThumbnail({ clip }: ClipThumbnailProps) {
           alignItems: 'center',
           justifyContent: 'center',
           position: 'relative',
+          backgroundImage: thumbnailSrc ? `url(${thumbnailSrc})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
         }}
       >
-        <Film size={24} color="var(--text-muted)" />
+        {!thumbnailSrc && <Film size={24} color="var(--text-muted)" />}
         {isHovered && (
           <div
             style={{
@@ -71,7 +84,7 @@ export function ClipThumbnail({ clip }: ClipThumbnailProps) {
             textOverflow: 'ellipsis',
           }}
         >
-          {clip.filename}
+          {truncateFilename(clip.filename)}
         </div>
         <div
           style={{
