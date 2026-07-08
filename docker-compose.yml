@@ -10,6 +10,7 @@ services:
       - ./web:/app
       - /app/node_modules
       - /app/.next
+      - ${CLIPS_BASE_PATH}:${CLIPS_BASE_PATH}
     environment:
       - NODE_ENV=development
     command: npm run dev
