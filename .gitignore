@@ -4,3 +4,4 @@ node_modules/
 ~/.claude-cut/
 .worktrees/
 .superpowers/
+graphify-out/
