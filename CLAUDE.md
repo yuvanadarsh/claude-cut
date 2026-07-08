@@ -119,9 +119,13 @@ claude-cut/
 │   │   │       ├── script/page.tsx  # script generation screen
 │   │   │       └── export/page.tsx  # export settings + progress
 │   │   └── api/
-│   │       ├── projects/route.ts    # CRUD for projects (filesystem)
-│   │       ├── script/route.ts      # calls Anthropic API
-│   │       └── processor/route.ts   # proxies to Python sidecar
+│   │       └── projects/
+│   │           ├── route.ts                        # GET list / POST create
+│   │           ├── temp-scan/route.ts               # GET clip count for a typed folder path (New Project flow)
+│   │           ├── [id]/route.ts                    # GET one / PATCH update
+│   │           ├── [id]/clips/route.ts              # GET scan + process (ffmpeg) clips for a project
+│   │           └── [id]/thumbnail/[filename]/route.ts  # GET serves a generated thumbnail
+│   │       # script/route.ts and processor/route.ts land in Session 3/4
 │   ├── components/
 │   │   ├── ui/                      # shared primitives
 │   │   │   ├── Button.tsx
@@ -145,8 +149,10 @@ claude-cut/
 │   │       └── ExportProgress.tsx
 │   ├── lib/
 │   │   ├── projects.ts              # filesystem read/write for projects
-│   │   ├── anthropic.ts             # Claude API wrapper
-│   │   └── processor.ts             # fetch wrapper for Python sidecar
+│   │   ├── clips.ts                 # scans a folder for video files
+│   │   ├── ffmpeg.ts                # duration + thumbnail extraction via ffprobe/ffmpeg
+│   │   ├── anthropic.ts             # Claude API wrapper (Session 3+)
+│   │   └── processor.ts             # fetch wrapper for Python sidecar (Session 4+)
 │   └── types/
 │       └── index.ts                 # all TypeScript interfaces (source of truth)
 │
