@@ -1,52 +1,36 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { ProjectCard } from '@/components/dashboard/ProjectCard';
 import { TopBar } from '@/components/layout/TopBar';
-import type { ProjectFormat, ProjectStatus } from '@/types';
+import type { Project } from '@/types';
 
-interface MockProject {
-  id: string;
-  name: string;
-  format: ProjectFormat;
-  status: ProjectStatus;
-  clipsFolder: string;
-  clipCount: number;
-  updatedAt: string;
-}
-
-const mockProjects: MockProject[] = [
-  {
-    id: 'proj-1',
-    name: 'NYC Weekend Vlog',
-    format: 'on-camera',
-    status: 'draft',
-    clipsFolder: '/Users/demo/Videos/nyc',
-    clipCount: 12,
-    updatedAt: '2 hours ago',
-  },
-  {
-    id: 'proj-2',
-    name: 'Cooking Tutorial — Pasta',
-    format: 'voiceover',
-    status: 'scripted',
-    clipsFolder: '/Users/demo/Videos/pasta',
-    clipCount: 8,
-    updatedAt: 'Yesterday',
-  },
-  {
-    id: 'proj-3',
-    name: 'Morning Routine',
-    format: 'hybrid',
-    status: 'exported',
-    clipsFolder: '/Users/demo/Videos/routine',
-    clipCount: 24,
-    updatedAt: '3 days ago',
-  },
-];
+type LoadState = 'loading' | 'error' | 'ready';
 
 export default function DashboardPage() {
-  const hasProjects = mockProjects.length > 0;
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loadState, setLoadState] = useState<LoadState>('loading');
+
+  const fetchProjects = useCallback(async () => {
+    setLoadState('loading');
+    try {
+      const res = await fetch('/api/projects');
+      if (!res.ok) throw new Error('Failed to load projects');
+      const data = (await res.json()) as Project[];
+      setProjects(data);
+      setLoadState('ready');
+    } catch {
+      setLoadState('error');
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -71,7 +55,7 @@ export default function DashboardPage() {
 
       {/* Main content */}
       <main style={{ flex: 1, padding: 32 }}>
-        {hasProjects ? (
+        {loadState === 'loading' && (
           <>
             <h2
               style={{
@@ -93,22 +77,70 @@ export default function DashboardPage() {
               }}
               className="projects-grid"
             >
-              {mockProjects.map((project) => (
-                <ProjectCard
-                  key={project.id}
-                  id={project.id}
-                  project={{
-                    name: project.name,
-                    format: project.format,
-                    status: project.status,
-                    clipCount: project.clipCount,
-                    updatedAt: project.updatedAt,
-                  }}
-                />
+              {[0, 1, 2].map((i) => (
+                <Card key={i} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <Skeleton height={18} width="60%" />
+                  <Skeleton height={14} width="40%" />
+                  <Skeleton height={14} width="80%" />
+                </Card>
               ))}
             </div>
           </>
-        ) : (
+        )}
+
+        {loadState === 'error' && (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 1,
+              minHeight: 'calc(100vh - 52px - 64px)',
+              gap: 16,
+            }}
+          >
+            <Card style={{ textAlign: 'center' }}>
+              <p style={{ fontSize: 14, color: 'var(--text-secondary)', margin: 0, marginBottom: 12 }}>
+                Could not load projects
+              </p>
+              <Button variant="ghost" onClick={fetchProjects}>
+                Retry
+              </Button>
+            </Card>
+          </div>
+        )}
+
+        {loadState === 'ready' && projects.length > 0 && (
+          <>
+            <h2
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: 20,
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                margin: 0,
+                marginBottom: 16,
+              }}
+            >
+              Your Projects
+            </h2>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: 16,
+              }}
+              className="projects-grid"
+            >
+              {projects.map((project) => (
+                <ProjectCard key={project.id} id={project.id} project={project} />
+              ))}
+            </div>
+          </>
+        )}
+
+        {loadState === 'ready' && projects.length === 0 && (
           <div
             style={{
               display: 'flex',

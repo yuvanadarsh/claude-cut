@@ -119,9 +119,13 @@ claude-cut/
 │   │   │       ├── script/page.tsx  # script generation screen
 │   │   │       └── export/page.tsx  # export settings + progress
 │   │   └── api/
-│   │       ├── projects/route.ts    # CRUD for projects (filesystem)
-│   │       ├── script/route.ts      # calls Anthropic API
-│   │       └── processor/route.ts   # proxies to Python sidecar
+│   │       └── projects/
+│   │           ├── route.ts                        # GET list / POST create
+│   │           ├── temp-scan/route.ts               # GET clip count for a typed folder path (New Project flow)
+│   │           ├── [id]/route.ts                    # GET one / PATCH update
+│   │           ├── [id]/clips/route.ts              # GET scan + process (ffmpeg) clips for a project
+│   │           └── [id]/thumbnail/[filename]/route.ts  # GET serves a generated thumbnail
+│   │       # script/route.ts and processor/route.ts land in Session 3/4
 │   ├── components/
 │   │   ├── ui/                      # shared primitives
 │   │   │   ├── Button.tsx
@@ -145,8 +149,10 @@ claude-cut/
 │   │       └── ExportProgress.tsx
 │   ├── lib/
 │   │   ├── projects.ts              # filesystem read/write for projects
-│   │   ├── anthropic.ts             # Claude API wrapper
-│   │   └── processor.ts             # fetch wrapper for Python sidecar
+│   │   ├── clips.ts                 # scans a folder for video files
+│   │   ├── ffmpeg.ts                # duration + thumbnail extraction via ffprobe/ffmpeg
+│   │   ├── anthropic.ts             # Claude API wrapper (Session 3+)
+│   │   └── processor.ts             # fetch wrapper for Python sidecar (Session 4+)
 │   └── types/
 │       └── index.ts                 # all TypeScript interfaces (source of truth)
 │
@@ -323,12 +329,22 @@ Projects are stored as JSON files on the local filesystem:
 - Export color picker presets (plan-mandated): `#FFFFFF`, `#FFE347`, `#47F0FF`, `#000000`
 - Fonts: Space Grotesk + JetBrains Mono via @fontsource; Inter via @fontsource/inter (body)
 
-**Phase 2 — Project Backend (Session 2)**
+**Phase 2 — Project Backend (Session 2)** ✅ Complete
 
-- [ ] Filesystem project CRUD (create, read, list)
-- [ ] Folder scanning — read clips from selected folder
-- [ ] Thumbnail generation via FFmpeg
-- [ ] Project state persisted to ~/.claude-cut/
+- [x] Filesystem project CRUD (create, read, list)
+- [x] Folder scanning — read clips from selected folder
+- [x] Thumbnail generation via FFmpeg
+- [x] Project state persisted to ~/.claude-cut/
+
+### Session 2 — Decisions + Notes
+
+- ffmpeg 8.1.2 is installed on the host machine and available in `PATH` (ffprobe bundled with it — no separate install)
+- `web/lib/projects.ts`, `web/lib/clips.ts`, `web/lib/ffmpeg.ts` hold all filesystem/scanning/ffmpeg logic — API routes stay thin, just call into `lib/`
+- `Clip.thumbnailPath` stores just the filename (`{clipId}.jpg`), not a full path — the thumbnail API route resolves it against `getThumbnailsDir(projectId)` and applies `path.basename()` to block path traversal
+- `createProject` seeds `project.script` with `{ topic, hook: '', sections: [], caption: '', hashtags: [] }` at creation time since `Script.topic` is the only place the New Project flow's topic input can live — Session 3's script generation overwrites the rest
+- New Project Step 2's Continue button is disabled until `temp-scan` confirms the folder is valid and non-empty (mirrors the Step 1 disabled-until-valid pattern already in place)
+- `graphify-out/` is gitignored — generated/reproducible, same treatment as `.next/`
+- Verified manually end-to-end with a real ffmpeg-generated test clip (including a filename with a space) via `docker`-free `next dev`: project creation, dashboard listing, clip scanning, real thumbnail + duration extraction, and thumbnail serving all confirmed working in-browser via Playwright
 
 **Phase 3 — Script Generation (Session 3)**
 

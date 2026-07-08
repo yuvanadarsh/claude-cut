@@ -1,14 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Video, Mic, Layers, type LucideIcon } from 'lucide-react';
 import { TopBar } from '@/components/layout/TopBar';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
+import type { Project } from '@/types';
 
 type Format = 'on-camera' | 'voiceover' | 'hybrid' | '';
+type ScanState = { status: 'idle' | 'checking' | 'valid' | 'empty' | 'not-found'; count: number };
 
 const formatOptions: {
   value: 'on-camera' | 'voiceover' | 'hybrid';
@@ -82,10 +84,66 @@ export default function NewProjectPage() {
   const [format, setFormat] = useState<Format>('');
   const [folder, setFolder] = useState('');
   const [topic, setTopic] = useState('');
+  const [scanState, setScanState] = useState<ScanState>({ status: 'idle', count: 0 });
+  const [isCreating, setIsCreating] = useState(false);
+  const [createError, setCreateError] = useState(false);
+  const folderInputRef = useRef<HTMLInputElement>(null);
 
-  function handleCreate() {
-    const id = Date.now().toString();
-    router.push('/projects/' + id);
+  useEffect(() => {
+    if (!folder.trim()) {
+      setScanState({ status: 'idle', count: 0 });
+      return;
+    }
+
+    setScanState({ status: 'checking', count: 0 });
+    const timeout = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/projects/temp-scan?path=${encodeURIComponent(folder)}`);
+        const data = (await res.json()) as { count: number; valid: boolean };
+        if (!data.valid) {
+          setScanState({ status: 'not-found', count: 0 });
+        } else if (data.count === 0) {
+          setScanState({ status: 'empty', count: 0 });
+        } else {
+          setScanState({ status: 'valid', count: data.count });
+        }
+      } catch {
+        setScanState({ status: 'not-found', count: 0 });
+      }
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [folder]);
+
+  function handleBrowseClick() {
+    folderInputRef.current?.click();
+  }
+
+  function handleFolderInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const relativePath = files[0].webkitRelativePath;
+      const topLevelDir = relativePath.split('/')[0];
+      setFolder(topLevelDir);
+    }
+  }
+
+  async function handleCreate() {
+    setIsCreating(true);
+    setCreateError(false);
+    try {
+      const res = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, format, clipsFolder: folder, topic }),
+      });
+      if (!res.ok) throw new Error('Failed to create project');
+      const project = (await res.json()) as Project;
+      router.push(`/projects/${project.id}/script`);
+    } catch {
+      setCreateError(true);
+      setIsCreating(false);
+    }
   }
 
   const topBarLeft = (
@@ -276,23 +334,44 @@ export default function NewProjectPage() {
                   placeholder="/Users/you/Videos/nyc-trip"
                   value={folder}
                   onChange={(e) => setFolder(e.target.value)}
-                  readOnly
                   style={{ flex: 1 }}
                 />
-                <Button variant="secondary" onClick={() => {}}>
+                <Button variant="secondary" onClick={handleBrowseClick}>
                   Browse
                 </Button>
+                <input
+                  ref={folderInputRef}
+                  type="file"
+                  // @ts-expect-error non-standard attribute, no React typing
+                  webkitdirectory=""
+                  style={{ display: 'none' }}
+                  onChange={handleFolderInputChange}
+                />
               </div>
 
-              {folder.length > 0 && (
-                <div
-                  style={{
-                    fontSize: 13,
-                    color: 'var(--success)',
-                    marginTop: 8,
-                  }}
-                >
-                  12 clips found
+              <div
+                style={{
+                  fontSize: 12,
+                  color: 'var(--text-muted)',
+                  marginTop: 6,
+                }}
+              >
+                Type your full folder path, e.g. /Users/yourname/Videos/nyc-trip
+              </div>
+
+              {scanState.status === 'valid' && (
+                <div style={{ fontSize: 13, color: 'var(--success)', marginTop: 8 }}>
+                  {scanState.count} clip{scanState.count === 1 ? '' : 's'} found
+                </div>
+              )}
+              {scanState.status === 'empty' && (
+                <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8 }}>
+                  No video files found
+                </div>
+              )}
+              {scanState.status === 'not-found' && (
+                <div style={{ fontSize: 13, color: 'var(--destructive)', marginTop: 8 }}>
+                  Folder not found
                 </div>
               )}
 
@@ -303,7 +382,11 @@ export default function NewProjectPage() {
                   marginTop: 32,
                 }}
               >
-                <Button variant="primary" onClick={() => setStep(3)}>
+                <Button
+                  variant="primary"
+                  disabled={scanState.status !== 'valid'}
+                  onClick={() => setStep(3)}
+                >
                   Continue
                 </Button>
               </div>
@@ -357,13 +440,20 @@ export default function NewProjectPage() {
               <div
                 style={{
                   display: 'flex',
-                  justifyContent: 'flex-end',
+                  flexDirection: 'column',
+                  alignItems: 'flex-end',
                   marginTop: 32,
+                  gap: 8,
                 }}
               >
-                <Button variant="primary" onClick={handleCreate}>
-                  Create Project
+                <Button variant="primary" disabled={isCreating} onClick={handleCreate}>
+                  {isCreating ? 'Creating...' : 'Create Project'}
                 </Button>
+                {createError && (
+                  <div style={{ fontSize: 13, color: 'var(--destructive)' }}>
+                    Something went wrong
+                  </div>
+                )}
               </div>
             </div>
           )}

@@ -5,15 +5,12 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import type { ProjectFormat, ProjectStatus } from '@/types';
+import type { Project, ProjectStatus } from '@/types';
 
-interface ProjectCardData {
-  name: string;
-  format: ProjectFormat;
-  status: ProjectStatus;
-  clipCount: number;
-  updatedAt: string;
-}
+type ProjectCardData = Pick<
+  Project,
+  'name' | 'format' | 'status' | 'assembly' | 'updatedAt'
+>;
 
 interface ProjectCardProps {
   project: ProjectCardData;
@@ -22,6 +19,17 @@ interface ProjectCardProps {
 
 function getStatusBadgeVariant(status: ProjectStatus): 'muted' | 'accent' {
   return status === 'exported' ? 'accent' : 'muted';
+}
+
+function formatRelativeTime(isoString: string): string {
+  const diffMs = Date.now() - new Date(isoString).getTime();
+  const minutes = Math.floor(diffMs / 60000);
+  if (minutes < 1) return 'just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
 }
 
 export function ProjectCard({ project, id }: ProjectCardProps) {
@@ -80,7 +88,7 @@ export function ProjectCard({ project, id }: ProjectCardProps) {
           }}
         >
           <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-            {project.clipCount} clips
+            {project.assembly?.clips.length ?? 0} clips
           </span>
           <span
             style={{
@@ -89,12 +97,15 @@ export function ProjectCard({ project, id }: ProjectCardProps) {
               fontFamily: "'JetBrains Mono', monospace",
             }}
           >
-            Updated {project.updatedAt}
+            Updated {formatRelativeTime(project.updatedAt)}
           </span>
         </div>
         {/* Row 2: Open button right-aligned */}
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Link href={`/projects/${id}`} style={{ textDecoration: 'none' }}>
+          <Link
+            href={project.status === 'draft' ? `/projects/${id}/script` : `/projects/${id}`}
+            style={{ textDecoration: 'none' }}
+          >
             <Button variant="ghost">Open</Button>
           </Link>
         </div>

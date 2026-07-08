@@ -13,10 +13,11 @@ A local-first, open-source AI video editing pipeline for Instagram Reels creator
 - [x] Export screen with subtitle settings and progress indicator
 - [x] Sidebar navigation + TopBar layout
 
-### Phase 2 — Project Backend (coming)
-- [ ] Filesystem project CRUD
-- [ ] Clip folder scanning
-- [ ] Thumbnail generation via FFmpeg
+### Phase 2 — Project Backend ✅
+- [x] Filesystem project CRUD (~/.claude-cut/projects/)
+- [x] Clip folder scanning
+- [x] Thumbnail generation via FFmpeg
+- [x] Dashboard, new project flow, and editor wired to real data (no mock data)
 
 ### Phase 3 — Script Generation (coming)
 - [ ] Anthropic Claude API integration
@@ -36,6 +37,7 @@ A local-first, open-source AI video editing pipeline for Instagram Reels creator
 ## Requirements
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Mac)
+- [ffmpeg](https://ffmpeg.org/) installed on the host machine and available in `PATH` — `brew install ffmpeg` (ffprobe comes bundled with it; used for thumbnail generation and clip duration)
 - An Anthropic API key (for script generation in Phase 3+)
 
 ## Setup
@@ -86,12 +88,16 @@ claude-cut/
 │   │   │       ├── page.tsx    # project editor
 │   │   │       ├── script/     # script generation
 │   │   │       └── export/     # export settings
-│   │   └── api/                # API routes (Phase 2+)
+│   │   └── api/                # API routes — projects CRUD, clip scanning, thumbnails
 │   ├── components/
 │   │   ├── ui/                 # Button, Input, Card, Badge, Skeleton
-│   │   ├── layout/             # Sidebar, TopBar
-│   │   ├── dashboard/          # ProjectCard
-│   │   └── editor/             # ScriptPanel, ClipPanel, EffectsBar, ...
+│   │   ├── layout/              # Sidebar, TopBar
+│   │   ├── dashboard/           # ProjectCard
+│   │   └── editor/              # ScriptPanel, ClipPanel, EffectsBar, ...
+│   ├── lib/
+│   │   ├── projects.ts          # filesystem CRUD for projects (~/.claude-cut/)
+│   │   ├── clips.ts             # scans a folder for video files
+│   │   └── ffmpeg.ts            # duration + thumbnail extraction via ffprobe/ffmpeg
 │   └── types/index.ts          # all TypeScript interfaces
 └── processor/                  # Python FastAPI sidecar (Phase 4)
 ```

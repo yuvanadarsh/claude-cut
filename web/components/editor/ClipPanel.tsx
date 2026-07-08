@@ -1,16 +1,15 @@
 import React from 'react';
 import { ClipThumbnail } from './ClipThumbnail';
+import { Skeleton } from '@/components/ui/Skeleton';
+import type { Clip } from '@/types';
 
-const MOCK_CLIPS = [
-  { id: '1', filename: 'nyc-drive.mp4', durationSeconds: 32 },
-  { id: '2', filename: 'times-square.mp4', durationSeconds: 45 },
-  { id: '3', filename: 'broadway-exterior.mp4', durationSeconds: 15 },
-  { id: '4', filename: 'walmart-pepsi.mp4', durationSeconds: 8 },
-  { id: '5', filename: 'ramen-bowl.mp4', durationSeconds: 12 },
-  { id: '6', filename: 'bagel-2am.mp4', durationSeconds: 20 },
-];
+interface ClipPanelProps {
+  clips: Clip[];
+  loading: boolean;
+  projectId: string;
+}
 
-export function ClipPanel() {
+export function ClipPanel({ clips, loading, projectId }: ClipPanelProps) {
   return (
     <div
       style={{
@@ -40,9 +39,13 @@ export function ClipPanel() {
           gap: 12,
         }}
       >
-        {MOCK_CLIPS.map((clip) => (
-          <ClipThumbnail key={clip.id} clip={clip} />
-        ))}
+        {loading
+          ? Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} height={144} />
+            ))
+          : clips.map((clip) => (
+              <ClipThumbnail key={clip.id} clip={clip} projectId={projectId} />
+            ))}
       </div>
     </div>
   );
