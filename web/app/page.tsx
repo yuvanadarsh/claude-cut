@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { ProjectCard } from '@/components/dashboard/ProjectCard';
+import { TopBar } from '@/components/layout/TopBar';
 
 interface MockProject {
   id: string;
@@ -48,34 +49,24 @@ export default function DashboardPage() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Custom header — wordmark at 24px 700 per spec */}
-      <header
-        style={{
-          height: 52,
-          backgroundColor: 'var(--surface)',
-          borderBottom: '1px solid var(--border)',
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 24px',
-          boxSizing: 'border-box',
-        }}
+      <TopBar
+        titleNode={
+          <span
+            style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: 24,
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+            }}
+          >
+            claude-cut
+          </span>
+        }
       >
-        <span
-          style={{
-            fontFamily: "'Space Grotesk', sans-serif",
-            fontSize: 24,
-            fontWeight: 700,
-            color: 'var(--text-primary)',
-          }}
-        >
-          claude-cut
-        </span>
         <Link href="/projects/new" style={{ textDecoration: 'none' }}>
           <Button variant="primary">New Project</Button>
         </Link>
-      </header>
+      </TopBar>
 
       {/* Main content */}
       <main style={{ flex: 1, padding: 32 }}>

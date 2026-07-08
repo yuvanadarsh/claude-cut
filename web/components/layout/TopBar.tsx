@@ -1,11 +1,12 @@
 import React from 'react';
 
 interface TopBarProps {
-  title: string;
+  title?: string;
+  titleNode?: React.ReactNode; // takes priority over title when provided
   children?: React.ReactNode;
 }
 
-export function TopBar({ title, children }: TopBarProps) {
+export function TopBar({ title, titleNode, children }: TopBarProps) {
   return (
     <header
       style={{
@@ -20,16 +21,18 @@ export function TopBar({ title, children }: TopBarProps) {
         boxSizing: 'border-box',
       }}
     >
-      <span
-        style={{
-          fontFamily: "'Space Grotesk', sans-serif",
-          fontSize: 16,
-          fontWeight: 600,
-          color: 'var(--text-primary)',
-        }}
-      >
-        {title}
-      </span>
+      {titleNode ?? (
+        <span
+          style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontSize: 16,
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+          }}
+        >
+          {title}
+        </span>
+      )}
       {children && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {children}

@@ -65,11 +65,19 @@ export function ProjectCard({ project, id }: ProjectCardProps) {
           paddingTop: 12,
           marginTop: 12,
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          flexDirection: 'column',
+          gap: 8,
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {/* Row 1: clip count (left) + updated timestamp (right) */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
           <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
             {project.clipCount} clips
           </span>
@@ -83,9 +91,12 @@ export function ProjectCard({ project, id }: ProjectCardProps) {
             Updated {project.updatedAt}
           </span>
         </div>
-        <Link href={`/projects/${id}`} style={{ textDecoration: 'none' }}>
-          <Button variant="ghost">Open</Button>
-        </Link>
+        {/* Row 2: Open button right-aligned */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Link href={`/projects/${id}`} style={{ textDecoration: 'none' }}>
+            <Button variant="ghost">Open</Button>
+          </Link>
+        </div>
       </div>
     </Card>
   );
