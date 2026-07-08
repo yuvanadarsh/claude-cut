@@ -3,12 +3,13 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { ProjectCard } from '@/components/dashboard/ProjectCard';
 import { TopBar } from '@/components/layout/TopBar';
+import type { ProjectFormat, ProjectStatus } from '@/types';
 
 interface MockProject {
   id: string;
   name: string;
-  format: string;
-  status: string;
+  format: ProjectFormat;
+  status: ProjectStatus;
   clipsFolder: string;
   clipCount: number;
   updatedAt: string;

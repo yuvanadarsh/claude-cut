@@ -1,17 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-
-interface Section {
-  id: string;
-  index: number;
-  text: string;
-  durationSeconds: number;
-  assignedClipId?: string;
-}
+import type { ScriptSection as ScriptSectionType } from '@/types';
 
 interface ScriptSectionProps {
-  section: Section;
+  section: Pick<ScriptSectionType, 'id' | 'index' | 'text' | 'durationSeconds' | 'assignedClipId'>;
   sectionColor: string;
   isSelected: boolean;
   onSelect: () => void;
@@ -27,7 +20,7 @@ export function ScriptSection({ section, sectionColor, isSelected, onSelect }: S
       onMouseLeave={() => setIsHovered(false)}
       style={{
         borderLeft: `3px solid ${sectionColor}`,
-        backgroundColor: isSelected ? '#202020' : 'var(--surface-raised)',
+        backgroundColor: isSelected ? 'var(--surface-selected)' : 'var(--surface-raised)',
         borderRadius: 6,
         padding: 16,
         cursor: 'pointer',

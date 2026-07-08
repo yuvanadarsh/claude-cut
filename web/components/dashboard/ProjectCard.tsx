@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import type { ProjectFormat, ProjectStatus } from '@/types';
 
 interface ProjectCardData {
   name: string;
-  format: string;
-  status: string;
+  format: ProjectFormat;
+  status: ProjectStatus;
   clipCount: number;
   updatedAt: string;
 }
@@ -19,7 +20,7 @@ interface ProjectCardProps {
   id: string;
 }
 
-function getStatusBadgeVariant(status: string): 'muted' | 'accent' {
+function getStatusBadgeVariant(status: ProjectStatus): 'muted' | 'accent' {
   return status === 'exported' ? 'accent' : 'muted';
 }
 

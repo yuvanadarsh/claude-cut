@@ -2,15 +2,10 @@
 
 import React, { useState } from 'react';
 import { Film } from 'lucide-react';
-
-interface Clip {
-  id: string;
-  filename: string;
-  durationSeconds: number;
-}
+import type { Clip } from '@/types';
 
 interface ClipThumbnailProps {
-  clip: Clip;
+  clip: Pick<Clip, 'id' | 'filename' | 'durationSeconds'>;
 }
 
 function formatDuration(seconds: number): string {
@@ -39,7 +34,7 @@ export function ClipThumbnail({ clip }: ClipThumbnailProps) {
       <div
         style={{
           height: 100,
-          backgroundColor: '#1A1A1A',
+          backgroundColor: 'var(--surface-raised)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

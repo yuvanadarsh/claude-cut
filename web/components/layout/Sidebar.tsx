@@ -3,12 +3,13 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
+import type { ProjectStatus } from '@/types';
 
 type ActivePage = 'script' | 'editor' | 'export';
 
 interface SidebarProps {
   projectName: string;
-  status: string;
+  status: ProjectStatus;
   activePage: ActivePage;
   projectId: string;
 }

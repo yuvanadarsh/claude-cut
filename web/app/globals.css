@@ -15,6 +15,7 @@
   --text-muted: #444444;
   --destructive: #FF4444;
   --success: #44FF88;
+  --surface-selected: #202020;
 }
 
 * {

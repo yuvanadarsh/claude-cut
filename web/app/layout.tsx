@@ -4,6 +4,8 @@ import '@fontsource/space-grotesk/500.css'
 import '@fontsource/space-grotesk/600.css'
 import '@fontsource/space-grotesk/700.css'
 import '@fontsource/jetbrains-mono'
+import '@fontsource/inter'
+import '@fontsource/inter/500.css'
 import './globals.css'
 
 export const metadata: Metadata = {
