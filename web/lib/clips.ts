@@ -2,7 +2,11 @@ import fs from 'fs/promises';
 import path from 'path';
 import type { Clip } from '@/types';
 
-const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.avi', '.mkv', '.webm'];
+const VIDEO_EXTENSIONS = [
+  '.mp4', '.mov', '.avi', '.mkv', '.webm',
+  '.MP4', '.MOV', '.AVI', '.MKV', '.WEBM',
+  '.m4v', '.M4V',
+];
 
 export function getVideoExtensions(): string[] {
   return VIDEO_EXTENSIONS;
