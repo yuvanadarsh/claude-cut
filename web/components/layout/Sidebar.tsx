@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { ChevronLeft } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import type { ProjectStatus } from '@/types';
 
@@ -22,6 +23,7 @@ interface NavItem {
 
 export function Sidebar({ projectName, status, activePage, projectId }: SidebarProps) {
   const [hoveredPage, setHoveredPage] = useState<ActivePage | null>(null);
+  const [backHovered, setBackHovered] = useState(false);
 
   const navItems: NavItem[] = [
     { label: 'Script', page: 'script', href: `/projects/${projectId}/script` },
@@ -41,8 +43,29 @@ export function Sidebar({ projectName, status, activePage, projectId }: SidebarP
         flexDirection: 'column',
       }}
     >
+      {/* Back to dashboard */}
+      <Link
+        href="/"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+          height: 36,
+          paddingLeft: 16,
+          textDecoration: 'none',
+          color: backHovered ? 'var(--text-secondary)' : 'var(--text-muted)',
+          fontSize: 12,
+          transition: 'color 150ms ease',
+        }}
+        onMouseEnter={() => setBackHovered(true)}
+        onMouseLeave={() => setBackHovered(false)}
+      >
+        <ChevronLeft size={14} />
+        All Projects
+      </Link>
+
       {/* Top section: project name + status */}
-      <div style={{ padding: '20px 16px 16px' }}>
+      <div style={{ padding: '8px 16px 16px' }}>
         <div
           style={{
             fontFamily: "'Space Grotesk', sans-serif",
