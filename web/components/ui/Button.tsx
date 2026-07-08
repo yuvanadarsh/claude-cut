@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive';
 
@@ -52,11 +54,18 @@ export function Button({
   className,
   disabled,
   style,
+  onMouseEnter,
+  onMouseLeave,
   ...props
 }: ButtonProps) {
+  const [isHovered, setIsHovered] = useState(false);
+
   const combinedStyle: React.CSSProperties = {
     ...baseStyle,
     ...variantStyles[variant],
+    ...(variant === 'ghost' && isHovered && !disabled
+      ? { color: 'var(--text-primary)' }
+      : {}),
     ...(disabled ? { opacity: 0.4, cursor: 'not-allowed' } : {}),
     ...style,
   };
@@ -66,6 +75,14 @@ export function Button({
       className={className}
       disabled={disabled}
       style={combinedStyle}
+      onMouseEnter={(e) => {
+        setIsHovered(true);
+        onMouseEnter?.(e);
+      }}
+      onMouseLeave={(e) => {
+        setIsHovered(false);
+        onMouseLeave?.(e);
+      }}
       {...props}
     >
       {children}
