@@ -301,16 +301,27 @@ Projects are stored as JSON files on the local filesystem:
 
 ## Current Phase
 
-**Phase 1 — UI Shell (Session 1)**
+**Phase 1 — UI Shell (Session 1)** ✅ Complete
 
-- [ ] Docker + docker-compose setup
-- [ ] Next.js scaffold with design system (fonts, colors, global styles)
-- [ ] Dashboard page
-- [ ] New Project flow (3 steps, no backend logic yet — mock data)
-- [ ] Project Editor shell (split panel layout, no clip loading yet)
-- [ ] Script screen (form only, no API call yet)
-- [ ] Export screen (UI only, no processing yet)
-- [ ] Sidebar + TopBar layout components
+- [x] Docker + docker-compose setup
+- [x] Next.js scaffold with design system (fonts, colors, global styles)
+- [x] Dashboard page
+- [x] New Project flow (3 steps, no backend logic yet — mock data)
+- [x] Project Editor shell (split panel layout, no clip loading yet)
+- [x] Script screen (form only, no API call yet)
+- [x] Export screen (UI only, no processing yet)
+- [x] Sidebar + TopBar layout components
+
+### Session 1 — Decisions + Notes
+
+- Design tokens registered in `tailwind.config.ts` as Tailwind utilities (e.g., `bg-surface`, `text-text-primary`)
+- Added `--surface-selected: #202020` to globals.css for ScriptSection selected state
+- TopBar extended with `titleNode?: React.ReactNode` prop to support the Dashboard's larger wordmark
+- Card extended with `HTMLAttributes<HTMLDivElement>` passthrough for hover event handling
+- All component prop types import from `web/types/index.ts` using `Pick<>` — no local re-definitions
+- Section colors (plan-mandated): `#4A7C6F` (teal), `#7C4A6A` (purple), `#4A5C7C` (blue), `#7C6A4A` (gold)
+- Export color picker presets (plan-mandated): `#FFFFFF`, `#FFE347`, `#47F0FF`, `#000000`
+- Fonts: Space Grotesk + JetBrains Mono via @fontsource; Inter via @fontsource/inter (body)
 
 **Phase 2 — Project Backend (Session 2)**
 
