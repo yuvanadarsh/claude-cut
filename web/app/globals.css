@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0A0A0A;
+  --surface: #111111;
+  --surface-raised: #1A1A1A;
+  --border: #222222;
+  --border-active: #333333;
+  --accent: #E8FF47;
+  --accent-dim: #B8CC38;
+  --text-primary: #F0F0F0;
+  --text-secondary: #777777;
+  --text-muted: #444444;
+  --destructive: #FF4444;
+  --success: #44FF88;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+}
